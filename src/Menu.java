@@ -20,13 +20,23 @@ public class Menu {
     int windowX = 700;
     int windowY = 350;
 
+
+    //money reloader
     private double userMoneyDouble;
     private String userMoney;
+
+
+    //history reloader
+    JPanel historyPanel;
+    List<List<String>> history;
+    JPanel rowPanel;
+
 
     //window
     JFrame frame;
     CardLayout cardLayout;
     JPanel panel;
+
 
     // db
     DB db = new DB();
@@ -156,6 +166,11 @@ public class Menu {
 
                 e -> {
                     cardLayout.show(panel, "historyWindow");
+                    try {
+                        reloadHistory(); // realod history each time the user want to see his history
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 },
 
                 e -> System.out.println("Button e clicked"),
@@ -361,7 +376,7 @@ public class Menu {
             DB db = new DB();
             try {
                 db.addMoney(-Double.parseDouble(amountMoneyArea.getText()));
-                reload();
+                reloadMoney();
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
@@ -380,7 +395,7 @@ public class Menu {
             DB db = new DB();
             try {
                 db.addMoney(Double.parseDouble(amountMoneyArea.getText()));
-                reload();
+                reloadMoney();
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
@@ -442,7 +457,7 @@ public class Menu {
             String type = typeBox.getSelectedItem().toString();
 
             try {
-                reload();
+                reloadMoney();
                 moneyBefore = db.getMoney();
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
@@ -488,7 +503,7 @@ public class Menu {
             }
 
             try {
-                reload();
+                reloadMoney();
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
@@ -510,36 +525,50 @@ public class Menu {
     }
 
     public JPanel historyWindow() throws SQLException {
+
         JPanel historyWindow = new JPanel(new BorderLayout(20, 20));
 
         JButton buttonReturn = new JButton("Return to Tools");
         buttonReturn.setFont(new Font(writingPolice, Font.BOLD, 30));
         buttonReturn.setBackground(Color.RED);
 
-        JPanel panelButtons = new JPanel(new GridLayout(1, 2, 10, 0));
+        JPanel panelButtons = new JPanel(new GridLayout(1, 1, 10, 0));
         panelButtons.add(buttonReturn);
         panelButtons.setBorder(new EmptyBorder(20, 30, 20, 30));
 
         historyWindow.add(panelButtons, BorderLayout.SOUTH);
 
-        JPanel historyPanel = new JPanel();
+        historyPanel = new JPanel();
         historyPanel.setLayout(new BoxLayout(historyPanel, BoxLayout.Y_AXIS));
 
         JScrollPane scrollPane = new JScrollPane(historyPanel);
         historyWindow.add(scrollPane, BorderLayout.CENTER);
 
+        JPanel headerPanel = new JPanel(new GridLayout(1, 7, 5, 0));
+        String[] columnsName = {"ID", "Money Before", "Amount", "Type" , "Money After", "Date", "Notes"};
+
+        for (String header : columnsName) { // add the names of the columns
+            JLabel headerLabel = new JLabel(header);
+            headerLabel.setFont(new Font(writingPolice, Font.BOLD, 20));
+            headerLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            headerPanel.add(headerLabel);
+        }
+        historyPanel.add(headerPanel); // add column names
 
         try {
-            List<List<String>> history = db.getHistory();
+            history = db.getHistory(); // get history from DB, table : "logs"
 
             for (List<String> row : history) {
-                JPanel rowPanel = new JPanel(new GridLayout(1, 7, 5, 0));
+                rowPanel = new JPanel(new GridLayout(1, 7, 5, 0));
 
                 for (String data : row) {
                     JLabel label = new JLabel(data);
+                    label.setHorizontalAlignment(SwingConstants.CENTER); // align cells
                     rowPanel.add(label);
+                    label.setBorder(BorderFactory.createLineBorder(Color.BLACK));
                 }
-
+                rowPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY)); // interline border
+                historyPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY)); // outline (exterior) border
                 historyPanel.add(rowPanel);
             }
         } catch (SQLException ex) {
@@ -553,12 +582,37 @@ public class Menu {
         return historyWindow;
     }
 
+
     /*public JPanel monthlyReportWindow() throws SQLException {
 
     }*/
 
+    public void reloadHistory() throws SQLException {
+        historyPanel.removeAll(); // delete everything and rewrite everything : maybe need to improve by just adding the new line each time
 
-    public void reload() throws SQLException {
+        history = db.getHistory();
+
+        rowPanel = new JPanel(new GridLayout(1, 7, 5, 0));
+
+        for (List<String> row : history) {
+            rowPanel = new JPanel(new GridLayout(1, 7, 5, 0));
+
+            for (String data : row) {
+                JLabel label = new JLabel(data);
+                label.setHorizontalAlignment(SwingConstants.CENTER); // align cells
+                rowPanel.add(label);
+                label.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            }
+            rowPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY)); // interline border
+            historyPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY)); // outline (exterior) border
+            historyPanel.add(rowPanel);
+        }
+
+        panel.revalidate();
+        panel.repaint();
+    }
+
+    public void reloadMoney() throws SQLException {
         userMoneyDouble = db.getMoney();
         userMoney = String.format("%.2f", userMoneyDouble);
         moneyButton.setText(userMoney + "$");
@@ -596,4 +650,4 @@ public class Menu {
             int dollarSignIndex = moneyString.length() - 1; // get index of "$" character
             moneyString = moneyString.substring(0, dollarSignIndex);
             moneyString = moneyString.replace(",", "."); // replace , by .
- */
+ */ 
