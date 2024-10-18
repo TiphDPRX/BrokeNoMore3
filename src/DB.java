@@ -55,6 +55,26 @@ public class DB {
         return 0;
     }
 
+    public double getMoneyLimit() throws SQLException {
+        try {
+            double money_limit = 0;
+            Connection connection = setDB();
+            Statement statement = connection.createStatement();
+
+            String query = "SELECT money_limit FROM user";
+
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+                money_limit = resultSet.getFloat("money_limit");
+            }
+            return money_limit;
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     public void addMoney(double moneyAmount) throws SQLException {
         try {
             Connection connection = setDB();
@@ -132,5 +152,22 @@ public class DB {
         return new ArrayList<>(); // if there is a problem, return an empty list of list
     }
 
-}
+    public void setMoneyLimit(double limit) throws SQLException {
+        try{
+            Connection connection = setDB();
 
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "UPDATE user SET money_limit = ?"
+            );
+            preparedStatement.setDouble(1, limit);
+
+            preparedStatement.executeUpdate();
+
+            connection.close();
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+}
