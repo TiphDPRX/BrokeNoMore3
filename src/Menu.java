@@ -751,7 +751,9 @@ public class Menu {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
+                    DatabaseCreation.createTableIfNotExists();
                     new Menu();
+
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
