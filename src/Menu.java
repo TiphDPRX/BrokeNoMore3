@@ -483,9 +483,10 @@ public class Menu {
                 return;
             }
 
+
             try{
-                if ((Objects.equals(type, "Withdraw") && transactionAmount > db.getMoneyLimit())){
-                    errorMessage("You have set a limit money at " + String.format("%.2f", db.getMoneyLimit()) + " $ ! Please modify it if you want withdraw beyond this limit !");
+                if ((Objects.equals(type, "Withdraw"))){
+                    errorMessage("You have " + String.format("%.2f", db.getMoney() - transactionAmount) + "$ in your account now !");
                     return;
                 }
             }
@@ -694,7 +695,7 @@ public class Menu {
                 return;
             }
 
-            if ( !!! textArea.getText().matches("^[0-9]+([,.][0-9]+)?$")){
+            if ( !!! textArea.getText().matches("^[0-9]+([,.][0-9][0-9])$")){
                 errorMessage("Put a valid limit amount !");
                 return;
             }

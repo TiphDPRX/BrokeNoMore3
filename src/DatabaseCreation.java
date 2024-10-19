@@ -3,10 +3,10 @@ import java.math.BigDecimal;
 import java.sql.*;
 
 public class DatabaseCreation {
-    private static final String DB_URL = "jdbc:mariadb://localhost:3306/hamburger_db";
+    private static final String DB_URL = "jdbc:mariadb://localhost:3307/brokenomore";
 
     private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "35qsym&PI"; //set the password related to your MariaDB
+    private static final String DB_PASSWORD = "zaf71sint"; //set the password related to your MariaDB
     public static void createTableIfNotExists(){
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
         Statement statement = connection.createStatement()
