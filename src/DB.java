@@ -29,6 +29,12 @@ public class DB {
         Connection connection = null;
         try {
             connection = DriverManager.getConnection(auth[0], auth[1], auth[2]);
+            Statement statement = connection.createStatement();
+
+            // Create database if it doesn't exist
+            statement.executeUpdate("CREATE DATABASE IF NOT EXISTS brokenomore");
+            // Switch to the brokenomore database
+            statement.executeUpdate("USE brokenomore");
         } catch (SQLException e) {
             e.printStackTrace();
         }
