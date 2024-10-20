@@ -13,7 +13,7 @@ import static java.lang.Math.round;
 
 public class Menu {
 
-    public String writingPolice = "Times New Roman";
+    public String writingPolice = "Times New Roman";  // set global variables from writing police as well as window size
     int windowX = 700;
     int windowY = 350;
 
@@ -40,7 +40,6 @@ public class Menu {
     DB db = new DB();
 
     double actualMoney = db.getMoney();
-
     JButton moneyButton; // button for user money amount
 
     public Menu() throws SQLException {
@@ -48,8 +47,8 @@ public class Menu {
         frame = new JFrame("BrokeNoMore Manager");
         frame.setSize(this.windowX, this.windowY);
         frame.setLocationRelativeTo(null); // put the frame in the middle of the frame
-        frame.setResizable(false);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setResizable(false); // disallow resizing the window
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // exit when close cross pressed
 
         cardLayout = new CardLayout();
         panel = new JPanel(cardLayout);
@@ -79,8 +78,8 @@ public class Menu {
 
     public JPanel menuLauncher() throws SQLException {
 
-        userMoneyDouble = db.getMoney();
-        userMoney = String.format("%.2f", userMoneyDouble);
+        userMoneyDouble = db.getMoney(); // get money amount from the databse
+        userMoney = String.format("%.2f", userMoneyDouble); // formatting into a string
         // set menu panel
         JPanel menuLauncher = new JPanel(new BorderLayout());
         //frame.setTitle("BrokeNoMore Manager");
@@ -89,11 +88,11 @@ public class Menu {
         titleLabel.setFont(new Font(writingPolice, Font.BOLD, 30));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER); // center the title
 
-        moneyButton = new JButton(this.userMoney + "$");
+        moneyButton = new JButton(this.userMoney + "$"); // label where the amount of money is displayed "button" because we need to click on it
         moneyButton.setFont(new Font(writingPolice, Font.PLAIN, 50));
         moneyButton.setBackground(Color.GREEN); // set color
 
-        JPanel panelBalance = new JPanel();
+        JPanel panelBalance = new JPanel(); // making a panel where we will put all the components
         panelBalance.setLayout(new BoxLayout(panelBalance, BoxLayout.Y_AXIS));
         panelBalance.add(titleLabel);
 
@@ -105,28 +104,32 @@ public class Menu {
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         moneyButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        // button tools
         JButton buttonTool = new JButton("Tools");
         buttonTool.setFont(new Font(writingPolice, Font.BOLD, 30));
         buttonTool.setBackground(Color.ORANGE);
 
+        // close button
         JButton buttonClose = new JButton("Close");
         buttonClose.setFont(new Font(writingPolice, Font.BOLD, 30));
         buttonClose.setBackground(Color.RED);
 
-        JPanel panelButtons = new JPanel(new GridLayout(1, 2, 10, 0));
+        JPanel panelButtons = new JPanel(new GridLayout(1, 2, 10, 0)); // grid layout for displaying the two buttons at the bottom of the panel
         panelButtons.add(buttonTool);
         panelButtons.add(buttonClose);
 
+        // setting sizes
         buttonClose.setSize(250, 100);
         buttonTool.setSize(250, 100);
 
+        // put an empty border for a margin effect
         panelButtons.setBorder(new EmptyBorder(20, 30, 20, 30));
         menuLauncher.add(panelBalance, BorderLayout.CENTER);
         menuLauncher.add(panelButtons, BorderLayout.SOUTH);
 
-
+        // actions listener
         buttonTool.addActionListener(e -> {
-            cardLayout.show(panel, "ToolWindow");
+            cardLayout.show(panel, "ToolWindow"); // showing "ToolWindow" panel
         });
 
         moneyButton.addActionListener(e -> {
@@ -146,11 +149,12 @@ public class Menu {
         JPanel toolWindow = new JPanel();
         //("BrokeNoMore Tools");
 
-        GridLayout grid = new GridLayout(3, 3, 10, 10);
+        GridLayout grid = new GridLayout(3, 3, 10, 10); // grid layout for all the buttons that represents the functionalities
         toolWindow.setLayout(grid);
 
-        String[] buttonNames = {"Converter", "Set Limit", "Actions", "History", "e", "d", "d", "r", "Return to menu"};
-        Color[] colors = {Color.GREEN, Color.YELLOW, Color.GRAY, Color.ORANGE, Color.PINK, Color.CYAN, Color.GRAY, Color.ORANGE, Color.RED};
+        String[] buttonNames = {"Converter", "Set Limit", "Actions", "History", "e", "d", "d", "r", "Return to menu"}; // all the names of the buttons
+        Color[] colors = {Color.GREEN, Color.YELLOW, Color.GRAY, Color.ORANGE, Color.PINK, Color.CYAN, Color.GRAY, Color.ORANGE, Color.RED}; // all the colors of the buttons, same order as the name of the buttons
+        // list of actions listener to every single buttons
         ActionListener[] eventListeners = {
                 e -> {
                     cardLayout.show(panel, "ConverterWindow");
@@ -169,7 +173,7 @@ public class Menu {
                     try {
                         reloadHistory(); // realod history each time the user want to see his history
                     } catch (SQLException ex) {
-                        throw new RuntimeException(ex);
+                        errorMessage(ex.getMessage());
                     }
                 },
 
@@ -182,12 +186,12 @@ public class Menu {
         };
 
         for (int i = 1; i <= 9; i++) {
-            JButton button = new JButton(buttonNames[i-1]);
-            button.setFont(new Font(writingPolice, Font.BOLD, 20));
-            button.setBackground(colors[i-1]);
-            toolWindow.add(button);
+            JButton button = new JButton(buttonNames[i-1]); // assign name to every buttons on our list
+            button.setFont(new Font(writingPolice, Font.BOLD, 20)); // assigning the same font for every buttons
+            button.setBackground(colors[i-1]); // assigning to each button its color
+            toolWindow.add(button); // add the button one by one to the panel
 
-            button.addActionListener(eventListeners[i-1]);
+            button.addActionListener(eventListeners[i-1]); // put the corresponding action listener to every button, one by one, in the ordre
         }
         //frame.setVisible(true);
         return toolWindow;
@@ -200,7 +204,7 @@ public class Menu {
 
         JLabel titleLabel = new JLabel("Asset Viewer");
         titleLabel.setFont(new Font(writingPolice, Font.BOLD, 30));
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER); // center
 
         JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         titlePanel.add(titleLabel);
@@ -219,7 +223,7 @@ public class Menu {
         tableMoney.setPreferredSize(new Dimension(500,500));
         JScrollPane scrollPane = new JScrollPane(tableMoney);
 
-        tableMoney.getColumnModel().getColumn(0).setPreferredWidth(20);
+        tableMoney.getColumnModel().getColumn(0).setPreferredWidth(20); // set the cells width
 
         tableMoney.setRowHeight(40);
         tableMoney.setFont(new Font(writingPolice, Font.BOLD, 30));
@@ -243,9 +247,11 @@ public class Menu {
         JPanel converterWindow = new JPanel(null);
         //frame.setTitle("Converter");
 
+        // creating two text areas
         JTextArea textArea = new JTextArea();
         JTextArea textArea2 = new JTextArea();
 
+        // align, set size, set borders of the text areas
         textArea.setBounds(100, 110, 200, 50);
         textArea.setFont(new Font(writingPolice, Font.BOLD, 30));
         textArea2.setBounds(400, 110, 200, 50);
@@ -255,11 +261,12 @@ public class Menu {
 
         textArea2.setEditable(false);
 
-        String[] listCurrencies = {"EUR", "USD", "GBP", "WON", "CA"};
-        JComboBox<String> currenciesBox = new JComboBox<>(listCurrencies);
+        String[] listCurrencies = {"EUR", "USD", "GBP", "WON", "CA"}; // put all the currencies we are proposing
+        JComboBox<String> currenciesBox = new JComboBox<>(listCurrencies); // create 2 comboboxes
         JComboBox<String> currenciesBox2 = new JComboBox<>(listCurrencies);
-        currenciesBox2.setSelectedIndex(1);
+        currenciesBox2.setSelectedIndex(1); // put the default index at 1 = USD so we have different currencies when we arrive on this menu
 
+        // setting font, size and adding them to the window
         currenciesBox.setFont(new Font(writingPolice, Font.BOLD, 30));
         currenciesBox.setBounds(100, 40, 200, 50);
 
@@ -272,6 +279,7 @@ public class Menu {
         converterWindow.add(textArea);
         converterWindow.add(textArea2);
 
+        // setting up two buttons, same code pattern for these two button at the bottom as the menuLauncher() function
         JButton buttonConvert = new JButton("Convert");
         buttonConvert.setFont(new Font(writingPolice, Font.BOLD, 30));
         buttonConvert.setBackground(Color.GREEN);
@@ -292,32 +300,31 @@ public class Menu {
                 return;
             }
 
-            if (!textArea.getText().matches("^[0-9]+([,.][0-9]+)?$")){ // regex to matches only numbers
+            if (!textArea.getText().matches("^[0-9]+([,.][0-9])?([0-9])?$")){ // regex to matches only numbers with 2 decimal after the comma or the dot
                 errorMessage("Please only enter a number !");
                 return;
             }
 
-            Map<String, Double> conversionRates = new HashMap<>();
+            Map<String, Double> conversionRates = new HashMap<>(); // creating a dictionnary
 
             conversionRates.put("EUR", 1.0); // 1 eur = 1 eur
             conversionRates.put("USD", 1.09); // 1 eur = 1.09 usd
-            conversionRates.put("GBP", 0.84);
+            conversionRates.put("GBP", 0.84); // and so on...
             conversionRates.put("WON", 1474.5);
             conversionRates.put("CA", 1.50);
 
+            // get the selected currencies for each boxes
             String startCurr = (String) currenciesBox.getSelectedItem();
             String targetCurr = (String) currenciesBox2.getSelectedItem();
 
-            String userInput = textArea.getText().replace(",", ".");
-            double amount = Double.parseDouble(userInput);
+            String userInput = textArea.getText().replace(",", "."); // replacing comma with dot whever we emcounter them
+            double amount = Double.parseDouble(userInput); // convert to double
 
             double amountEur = amount / conversionRates.get(startCurr); // convert in EUR
 
             double amountTarget = amountEur * conversionRates.get(targetCurr); // convert in the target currency
 
-            textArea2.setText(String.format("%.2f", amountTarget)); // convert double to string
-
-
+            textArea2.setText(String.format("%.2f", amountTarget)); // convert double to string and display with the specific format
         });
 
         buttonReturn.addActionListener(e -> {
@@ -327,8 +334,12 @@ public class Menu {
     }
 
     public JPanel manageMoneyWindow() throws SQLException{
+        /*
+         ************** FUNCTION NEED TO BE DELETED ****************************************************************
+         */
         JPanel moneyWindow = new JPanel(new BorderLayout());
 
+        // adding some buttons with the same logic as previously
         JButton buttonAddMoney = new JButton("Add Money");
         buttonAddMoney.setFont(new Font(writingPolice, Font.BOLD, 30));
         buttonAddMoney.setBackground(new Color(0, 255, 0)); // color green
@@ -409,6 +420,7 @@ public class Menu {
     public JPanel actionsWindow() throws SQLException {
         JPanel actionsWindow = new JPanel(new BorderLayout(20,20));
 
+        // adding buttons with the same logic as previously
         JButton buttonLog = new JButton("Log Action");
         buttonLog.setFont(new Font(writingPolice, Font.BOLD, 30));
         buttonLog.setBackground(new Color(0, 255, 0)); // green
@@ -424,18 +436,20 @@ public class Menu {
 
         actionsWindow.add(panelButtons, BorderLayout.SOUTH);
 
+        // adding text areas with the same logic as before
         JTextArea amountMoneyArea = new JTextArea();
         amountMoneyArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 5, true));
         amountMoneyArea.setFont(new Font(writingPolice, Font.BOLD, 30));
 
-        String[] typeTransaction = {"Deposit", "Withdraw"};
-        JComboBox<String> typeBox = new JComboBox<>(typeTransaction);
+        String[] typeTransaction = {"Deposit", "Withdraw"}; // two types of transactions
+        JComboBox<String> typeBox = new JComboBox<>(typeTransaction); // combobox for the type of transaction
         typeBox.setFont(new Font(writingPolice, Font.BOLD, 30));
 
         JTextArea transactionNotesArea = new JTextArea();
         transactionNotesArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 5, true));
         transactionNotesArea.setFont(new Font(writingPolice, Font.BOLD, 30));
 
+        // adding corresponding text to each input box
         JPanel panelActions = new JPanel(new GridLayout(3, 2, 2, 20));
         panelActions.add(new JLabel("Amount:"));
         panelActions.add(amountMoneyArea);
@@ -452,87 +466,77 @@ public class Menu {
         });
 
         buttonLog.addActionListener(e -> {
-            double moneyBefore = 0;
-            double moneyAfter = 0;
-            String notes = transactionNotesArea.getText();
-            String type = typeBox.getSelectedItem().toString();
+            double moneyBefore = 0; // variable for the money before the transaction
+            double moneyAfter = 0; // variable for the money after the transaction
+            String notes = transactionNotesArea.getText(); // notes that the user want to put for the transaction
+            String type = typeBox.getSelectedItem().toString(); // get the option the user want : "deposit" or "withdraw"
 
             try {
-                reloadMoney();
+                reloadMoney(); // reloading the amount of money
                 moneyBefore = db.getMoney();
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
 
             if (amountMoneyArea.getText().isEmpty() || transactionNotesArea.getText().isEmpty()){
-                errorMessage("Please fill all the fields !");
+                errorMessage("Please fill all the fields !"); // if the fields are empty, display error
                 return;
             }
 
-            if (!amountMoneyArea.getText().matches("^[0-9]+([,.][0-9]+)?$")){  // regex matching number with only one "." or ","
+            if (!amountMoneyArea.getText().matches("^[0-9]+([,.][0-9])?([0-9])?$")){  // regex matching number with only one "." or ","
                 errorMessage("Please enter numbers only on the money area !");
                 return;
             }
 
             String moneyAreaDoubleString = amountMoneyArea.getText().replace(",", "."); // we allowed "," caracter, so we should replace it by "." so it will not get an error when parsing to double
 
-            double transactionAmount = Double.parseDouble(moneyAreaDoubleString);
+            double transactionAmount = Double.parseDouble(moneyAreaDoubleString); // convert to double
 
             if (transactionAmount < 0){
-                errorMessage("Please enter a positive amount of money !");
+                errorMessage("Please enter a positive amount of money !"); // check positive amount of money
                 return;
             }
 
-
             try{
-                if ((Objects.equals(type, "Withdraw"))){
-                    errorMessage("You have " + String.format("%.2f", db.getMoney() - transactionAmount) + "$ in your account now !");
-                    return;
-                }
-            }
-            catch (SQLException exc){
-                exc.printStackTrace();
-            }
-
-            try{
-                if (Objects.equals(type, "Withdraw") && transactionAmount > db.getMoney()){
-                    errorMessage("You can't deposit this amount as you don't have enough money !");
+                if (Objects.equals(type, "Withdraw") && transactionAmount > db.getMoney()){ // check if the user want to withdraw more money than ha actually has
+                    errorMessage("You can't withdraw this amount as you don't have enough money !");
                     return;
                 }
             } catch (SQLException ex) {
-                ex.printStackTrace();
+                errorMessage(ex.getMessage());
             }
 
             if (type == "Deposit"){
-                moneyAfter = moneyBefore + transactionAmount;
+                moneyAfter = moneyBefore + transactionAmount; // calculate the money after if the user make deposti
                 try {
-                    db.addMoney(transactionAmount);
+                    db.addMoney(transactionAmount); // add money corresponding to the amount of money
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
             }
+
             else if (type == "Withdraw"){
-                moneyAfter = moneyBefore - transactionAmount;
+                moneyAfter = moneyBefore - transactionAmount; // calculate the money after if the user make withdrawing
                 try {
-                    db.addMoney(-transactionAmount);
+                    db.addMoney(-transactionAmount); // add money corresponding to the negative of the value of money
                 } catch (SQLException ex) {
                     throw new RuntimeException(ex);
                 }
             }
             try {
-                db.addLogs(moneyBefore, transactionAmount, type, moneyAfter, notes);
+                db.addLogs(moneyBefore, transactionAmount, type, moneyAfter, notes); // add the actions to the logs
             }
             catch (SQLException ex) {
                 ex.printStackTrace();
             }
 
             try {
-                reloadMoney();
+                reloadMoney(); // reload the user money in the database
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
 
-            if (type == "Deposit"){
+            if (type == "Deposit"){ // display message accordingly
                 errorMessage("Successfully deposit " + transactionAmount + "$ ! You have now " + String.format("%.2f", moneyAfter) + "$ !");
             }
 
@@ -540,6 +544,7 @@ public class Menu {
                 errorMessage("Successful withdraw " + transactionAmount + "$ ! You have now " + String.format("%.2f", moneyAfter) + "$ !");
             }
 
+            // reset to text areas, ready to proceed another withdrax/deposit
             amountMoneyArea.setText("");
             transactionNotesArea.setText("");
 
@@ -552,6 +557,7 @@ public class Menu {
 
         JPanel historyWindow = new JPanel(new BorderLayout(20, 20));
 
+        // implementing buttons using the same logic as before
         JButton buttonReturn = new JButton("Return to Tools");
         buttonReturn.setFont(new Font(writingPolice, Font.BOLD, 30));
         buttonReturn.setBackground(Color.RED);
@@ -568,9 +574,9 @@ public class Menu {
         JScrollPane scrollPane = new JScrollPane(historyPanel);
         historyWindow.add(scrollPane, BorderLayout.CENTER);
 
-        JPanel headerPanel = new JPanel(new GridLayout(1, 7, 5, 0));
+        JPanel headerPanel = new JPanel(new GridLayout(1, 7, 5, 0)); // gird panel for displaying the columns if the database
 
-        for (String header : columnsName) { // add the names of the columns
+        for (String header : columnsName) { // add the names of the columns (equivalent of for header in columnsName)
             JLabel headerLabel = new JLabel(header);
             headerLabel.setFont(new Font(writingPolice, Font.BOLD, 20));
             headerLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -581,10 +587,10 @@ public class Menu {
         try {
             history = db.getHistory(); // get history from DB, table : "logs"
 
-            for (List<String> row : history) {
+            for (List<String> row : history) { // equivalent to (for row in history)
                 rowPanel = new JPanel(new GridLayout(1, 7, 5, 0));
 
-                for (String data : row) {
+                for (String data : row) { // equivalent to (for data in row)
                     JLabel label = new JLabel(data);
                     label.setHorizontalAlignment(SwingConstants.CENTER); // align cells
                     rowPanel.add(label);
@@ -611,11 +617,12 @@ public class Menu {
     }*/
 
     public void reloadHistory() throws SQLException {
+        // this function is simply the history function in order to reload it
         historyPanel.removeAll(); // delete everything and rewrite everything : maybe need to improve by just adding the new line each time
 
-        history = db.getHistory();
+        history = db.getHistory(); // get history from DB, table : "logs"
 
-        rowPanel = new JPanel(new GridLayout(1, 7, 5, 0));
+        rowPanel = new JPanel(new GridLayout(1, 7, 5, 0)); // grid layout for the headers
 
         for (String header : columnsName) { // add the names of the columns
             JLabel headerLabel = new JLabel(header);
@@ -646,6 +653,7 @@ public class Menu {
     public JPanel limitWindow() throws SQLException {
         JPanel limitWindow = new JPanel(null);
 
+        // create 2 texts areas, set text, font, borders
         JTextArea textArea = new JTextArea();
         JTextArea textArea2 = new JTextArea();
 
@@ -660,6 +668,7 @@ public class Menu {
 
         textArea2.setText(String.format("%.2f", db.getMoneyLimit()));
 
+        // put two labels
         JLabel limitArea = new JLabel("Set new limit");
         JLabel limitAreaDisplay = new JLabel("Current limit");
 
@@ -675,6 +684,7 @@ public class Menu {
         limitWindow.add(textArea);
         limitWindow.add(textArea2);
 
+        // implementing two buttons, using the same logic as before
         JButton buttonSetLimit = new JButton("Set Limit");
         buttonSetLimit.setFont(new Font(writingPolice, Font.BOLD, 30));
         buttonSetLimit.setBackground(Color.GREEN);
@@ -695,22 +705,17 @@ public class Menu {
                 return;
             }
 
-            if ( !!! textArea.getText().matches("^[0-9]+([,.][0-9][0-9])$")){
+            if ( !!! textArea.getText().matches("^[0-9]+([,.][0-9])?([0-9])?$")){ // allowing only number with 2 decimal maximum after the comma or the dot
                 errorMessage("Put a valid limit amount !");
                 return;
             }
 
             try {
-                String amountString = textArea.getText().replace(",", ".");
-                double amountDouble = Double.parseDouble(amountString);
+                String amountString = textArea.getText().replace(",", "."); // replace comma with dot if needed
+                double amountDouble = Double.parseDouble(amountString); // convert to double
 
-                if (amountDouble > db.getMoney()){
-                    errorMessage("You have only " + String.format("%.2f",db.getMoney()) + " $ ! Try a smaller amount !");
-                    return;
-                }
-
-                db.setMoneyLimit(amountDouble);
-                textArea2.setText(amountString);
+                db.setMoneyLimit(amountDouble); // set money limit
+                textArea2.setText(String.format("%.2f", amountDouble)); // display the new limit in the second text area
 
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
@@ -726,6 +731,7 @@ public class Menu {
 
 
     public void reloadMoney() throws SQLException {
+        // function used to reload money in the display in the home menu, the function take element from the original function
         userMoneyDouble = db.getMoney();
         userMoney = String.format("%.2f", userMoneyDouble);
         moneyButton.setText(userMoney + "$");
@@ -762,11 +768,3 @@ public class Menu {
         });
     }
 }
-
-
-/*
-            String moneyString = moneyButton.getText();
-            int dollarSignIndex = moneyString.length() - 1; // get index of "$" character
-            moneyString = moneyString.substring(0, dollarSignIndex);
-            moneyString = moneyString.replace(",", "."); // replace , by .
- */ 
