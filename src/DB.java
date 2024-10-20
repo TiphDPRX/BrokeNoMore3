@@ -15,6 +15,7 @@ public class DB {
             e.printStackTrace();
         }
 
+        // get data from config.properties file
         String dbUrl = props.getProperty("db.url");
         String dbUser = props.getProperty("db.user");
         String dbPass = props.getProperty("db.password");
@@ -28,6 +29,7 @@ public class DB {
         String[] auth = GetDbInfo();
         Connection connection = null;
         try {
+            // connection to the database with the credential we get from calling function getInfo
             connection = DriverManager.getConnection(auth[0], auth[1], auth[2]);
             Statement statement = connection.createStatement();
 
@@ -47,10 +49,10 @@ public class DB {
             Connection connection = setDB();
             Statement statement = connection.createStatement();
 
-            String query = "SELECT money FROM user";
+            String query = "SELECT money FROM user"; // query to get user money
 
             ResultSet resultSet = statement.executeQuery(query);
-            while (resultSet.next()) {
+            while (resultSet.next()) { // get query returned result
                 money = resultSet.getFloat("money");
             }
             return money;
@@ -67,10 +69,10 @@ public class DB {
             Connection connection = setDB();
             Statement statement = connection.createStatement();
 
-            String query = "SELECT money_limit FROM user";
+            String query = "SELECT money_limit FROM user"; // query to get money_limit
 
             ResultSet resultSet = statement.executeQuery(query);
-            while (resultSet.next()) {
+            while (resultSet.next()) { // read query and get query result
                 money_limit = resultSet.getFloat("money_limit");
             }
             return money_limit;
@@ -85,9 +87,9 @@ public class DB {
         try {
             Connection connection = setDB();
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "UPDATE user SET money = money + ?"
+                    "UPDATE user SET money = money + ?" // statement to upadte the money the user got
             );
-            preparedStatement.setDouble(1, moneyAmount);
+            preparedStatement.setDouble(1, moneyAmount); // put the value of money
 
             preparedStatement.executeUpdate();
         }
@@ -100,8 +102,10 @@ public class DB {
         try{
             Connection connection = setDB();
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "INSERT INTO logs(moneyBefore, amount, type, moneyAfter, notes) VALUES (?, ?, ?, ?, ?)"
+                    "INSERT INTO logs(moneyBefore, amount, type, moneyAfter, notes) VALUES (?, ?, ?, ?, ?)" // statement to update logs
             );
+
+            // put the corresponding value into the statement
             preparedStatement.setDouble(1, moneyBefore);
             preparedStatement.setDouble(2, amount);
             preparedStatement.setString(3, type);
@@ -125,12 +129,12 @@ public class DB {
 
             Statement statement = connection.createStatement();
 
-            String query = "SELECT * FROM logs";
+            String query = "SELECT * FROM logs"; // query to select all records from logs table
 
             ResultSet resultSet = statement.executeQuery(query);
 
             while (resultSet.next()) {
-                line = new ArrayList<>();
+                line = new ArrayList<>(); // store the data in an array
 
                 String id = resultSet.getString("id"); // get query responses
                 String moneyBefore = resultSet.getString("moneyBefore");
@@ -163,9 +167,9 @@ public class DB {
             Connection connection = setDB();
 
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "UPDATE user SET money_limit = ?"
+                    "UPDATE user SET money_limit = ?" // statement to update money_limit
             );
-            preparedStatement.setDouble(1, limit);
+            preparedStatement.setDouble(1, limit); // put value into the statement
 
             preparedStatement.executeUpdate();
 
