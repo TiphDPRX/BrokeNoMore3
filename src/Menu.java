@@ -57,7 +57,6 @@ public class Menu {
         JPanel toolWindow = toolWindow();
         JPanel moneyWindow = moneyWindow();
         JPanel converterWindow = converterWindow();
-        JPanel manageMoneyWindow = manageMoneyWindow();
         //JPanel monthlyReportWindow = monthlyReportWindow();
         JPanel actionsWindow = actionsWindow();
         JPanel historyWindow = historyWindow();
@@ -67,7 +66,6 @@ public class Menu {
         panel.add(toolWindow, "ToolWindow");
         panel.add(moneyWindow, "MoneyWindow");
         panel.add(converterWindow, "ConverterWindow");
-        panel.add(manageMoneyWindow, "manageMoneyWindow");
         panel.add(actionsWindow, "actionsWindow");
         panel.add(historyWindow, "historyWindow");
         panel.add(limitWindow, "limitWindow");
@@ -333,89 +331,6 @@ public class Menu {
         return converterWindow;
     }
 
-    public JPanel manageMoneyWindow() throws SQLException{
-        /*
-         ************** FUNCTION NEED TO BE DELETED ****************************************************************
-         */
-        JPanel moneyWindow = new JPanel(new BorderLayout());
-
-        // adding some buttons with the same logic as previously
-        JButton buttonAddMoney = new JButton("Add Money");
-        buttonAddMoney.setFont(new Font(writingPolice, Font.BOLD, 30));
-        buttonAddMoney.setBackground(new Color(0, 255, 0)); // color green
-
-        JButton buttonRemoveMoney = new JButton("Remove Money");
-        buttonRemoveMoney.setFont(new Font(writingPolice, Font.BOLD, 30));
-        buttonRemoveMoney.setBackground(Color.ORANGE);
-
-        JButton buttonReturn = new JButton("Return to Tools");
-        buttonReturn.setFont(new Font(writingPolice, Font.BOLD, 30));
-        buttonReturn.setBackground(Color.RED);
-
-        JPanel panelButtons = new JPanel(new GridLayout(1, 2, 10, 0));
-        panelButtons.add(buttonAddMoney);
-        panelButtons.add(buttonRemoveMoney);
-        panelButtons.add(buttonReturn);
-
-        //buttonReturn.setSize(250, 100);
-        //buttonAddMoney.setSize(250, 100);
-
-        panelButtons.setBorder(new EmptyBorder(20, 30, 20, 30));
-        moneyWindow.add(panelButtons, BorderLayout.SOUTH);
-
-        JTextArea amountMoneyArea = new JTextArea();
-        amountMoneyArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 5, true));
-        amountMoneyArea.setFont(new Font(writingPolice, Font.BOLD, 30));
-        moneyWindow.add(amountMoneyArea, BorderLayout.CENTER);
-
-        buttonReturn.addActionListener(e -> {
-            cardLayout.show(panel, "ToolWindow");
-        });
-
-        buttonRemoveMoney.addActionListener(e -> {
-            if (amountMoneyArea.getText().isEmpty()){
-                errorMessage("Please specify the amount you want to remove !");
-                return;
-            }
-            else if (Double.parseDouble(amountMoneyArea.getText()) < 0){
-                errorMessage("Please enter a positive number !");
-                return;
-            }
-            else if (actualMoney < Double.parseDouble(amountMoneyArea.getText())){
-                errorMessage("You don't have enough money !");
-                return;
-            }
-
-            DB db = new DB();
-            try {
-                db.addMoney(-Double.parseDouble(amountMoneyArea.getText()));
-                reloadMoney();
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-
-        buttonAddMoney.addActionListener(e -> {
-            if (amountMoneyArea.getText().isEmpty()){
-                errorMessage("Please specify the amount you want to add !");
-                return;
-            }
-            else if (Double.parseDouble(amountMoneyArea.getText()) < 0){
-                errorMessage("Please enter a positive number !");
-                return;
-            }
-
-            DB db = new DB();
-            try {
-                db.addMoney(Double.parseDouble(amountMoneyArea.getText()));
-                reloadMoney();
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-
-        return moneyWindow;
-    }
 
     public JPanel actionsWindow() throws SQLException {
         JPanel actionsWindow = new JPanel(new BorderLayout(20,20));
@@ -716,7 +631,8 @@ public class Menu {
 
                 db.setMoneyLimit(amountDouble); // set money limit into db
                 textArea2.setText(String.format("%.2f", amountDouble)); // display the new limit in the second text area
-                infoMessage("Succesfully set the new limit at " + amountString);
+                infoMessage("Succesfully set the new limit at " + amountString + "$ !");
+                textArea.setText("");
 
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
