@@ -498,8 +498,8 @@ public class Menu {
             }
 
             try{
-                if (Objects.equals(type, "Withdraw") && transactionAmount > db.getMoney()){ // check if the user want to withdraw more money than ha actually has
-                    errorMessage("You can't withdraw this amount as you don't have enough money !");
+                if (Objects.equals(type, "Withdraw") && transactionAmount > db.getMoney() + db.getMoneyLimit()){ // check if the user want to withdraw more money than ha actually has
+                    errorMessage("You can't withdraw " + transactionAmount + "$ ! You will be overdrawn by " + String.format("%.2f", db.getMoney() - transactionAmount) + "$ !");
                     return;
                 }
             } catch (SQLException ex) {
@@ -537,11 +537,11 @@ public class Menu {
             }
 
             if (type == "Deposit"){ // display message accordingly
-                errorMessage("Successfully deposit " + transactionAmount + "$ ! You have now " + String.format("%.2f", moneyAfter) + "$ !");
+                infoMessage("Successfully deposit " + transactionAmount + "$ ! You have now " + String.format("%.2f", moneyAfter) + "$ !");
             }
 
             if (type == "Withdraw"){
-                errorMessage("Successful withdraw " + transactionAmount + "$ ! You have now " + String.format("%.2f", moneyAfter) + "$ !");
+                infoMessage("Successful withdraw " + transactionAmount + "$ ! You have now " + String.format("%.2f", moneyAfter) + "$ !");
             }
 
             // reset to text areas, ready to proceed another withdrax/deposit
@@ -714,8 +714,9 @@ public class Menu {
                 String amountString = textArea.getText().replace(",", "."); // replace comma with dot if needed
                 double amountDouble = Double.parseDouble(amountString); // convert to double
 
-                db.setMoneyLimit(amountDouble); // set money limit
+                db.setMoneyLimit(amountDouble); // set money limit into db
                 textArea2.setText(String.format("%.2f", amountDouble)); // display the new limit in the second text area
+                infoMessage("Succesfully set the new limit at " + amountString);
 
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
@@ -741,7 +742,11 @@ public class Menu {
     }
 
     public void errorMessage(String message){
-        JOptionPane.showMessageDialog(panel, "WARNING : " + message); // format all error message so we onyl have to call this function when we want to display an error message
+        JOptionPane.showMessageDialog(panel, "🚨 WARNING : " + message); // format all error message so we onyl have to call this function when we want to display an error message
+    }
+
+    public void infoMessage(String message){
+        JOptionPane.showMessageDialog(panel, "INFO : " + message);
     }
 
 
