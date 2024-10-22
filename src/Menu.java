@@ -13,7 +13,7 @@ import static java.lang.Math.round;
 
 public class Menu {
 
-    public String writingPolice = "Times New Roman";  // set global variables from writing police as well as window size
+    public String writingPolice = "Garamond";  // set global variables from writing police as well as window size
     int windowX = 700;
     int windowY = 350;
 
@@ -41,6 +41,11 @@ public class Menu {
 
     double actualMoney = db.getMoney();
     JButton moneyButton; // button for user money amount
+
+    // colors
+    Color beigeParchemin = new Color(245,222,175); // name of the color
+    Color colorBrown = new Color(205,133,63);
+
 
     public Menu() throws SQLException {
         //set up frame
@@ -88,7 +93,14 @@ public class Menu {
 
         moneyButton = new JButton(this.userMoney + "$"); // label where the amount of money is displayed "button" because we need to click on it
         moneyButton.setFont(new Font(writingPolice, Font.PLAIN, 50));
-        moneyButton.setBackground(Color.GREEN); // set color
+        moneyButton.setBackground(new Color(255, 239, 213)); // set color
+
+        if (db.getMoney() < 0){
+            moneyButton.setBorder(BorderFactory.createLineBorder(Color.RED, 5, true));
+        }
+        else{
+            moneyButton.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1, true));
+        }
 
         JPanel panelBalance = new JPanel(); // making a panel where we will put all the components
         panelBalance.setLayout(new BoxLayout(panelBalance, BoxLayout.Y_AXIS));
@@ -105,12 +117,12 @@ public class Menu {
         // button tools
         JButton buttonTool = new JButton("Tools");
         buttonTool.setFont(new Font(writingPolice, Font.BOLD, 30));
-        buttonTool.setBackground(Color.ORANGE);
+        buttonTool.setBackground(new Color(245,222,175)); // button tool on main window
 
         // close button
         JButton buttonClose = new JButton("Close");
         buttonClose.setFont(new Font(writingPolice, Font.BOLD, 30));
-        buttonClose.setBackground(Color.RED);
+        buttonClose.setBackground(colorBrown); // button close main
 
         JPanel panelButtons = new JPanel(new GridLayout(1, 2, 10, 0)); // grid layout for displaying the two buttons at the bottom of the panel
         panelButtons.add(buttonTool);
@@ -138,7 +150,6 @@ public class Menu {
             frame.dispose();
             System.exit(0); // stop the Java program from running
         });
-
         return menuLauncher;
     }
 
@@ -146,12 +157,13 @@ public class Menu {
     public JPanel toolWindow() {
         JPanel toolWindow = new JPanel();
         //("BrokeNoMore Tools");
-
-        GridLayout grid = new GridLayout(3, 3, 10, 10); // grid layout for all the buttons that represents the functionalities
+        int nbRows = 2;
+        int nbCols = 3;
+        GridLayout grid = new GridLayout(nbRows, nbCols, 10, 10); // grid layout for all the buttons that represents the functionalities
         toolWindow.setLayout(grid);
 
-        String[] buttonNames = {"Converter", "Set Limit", "Actions", "History", "e", "d", "d", "r", "Return to menu"}; // all the names of the buttons
-        Color[] colors = {Color.GREEN, Color.YELLOW, Color.GRAY, Color.ORANGE, Color.PINK, Color.CYAN, Color.GRAY, Color.ORANGE, Color.RED}; // all the colors of the buttons, same order as the name of the buttons
+        String[] buttonNames = {"Converter", "Set Limit", "Actions", "History", "e", "Return to menu"}; // all the names of the buttons
+        Color[] colors = {beigeParchemin, beigeParchemin, beigeParchemin, beigeParchemin, beigeParchemin, colorBrown}; // all the colors of the buttons, same order as the name of the buttons
         // list of actions listener to every single buttons
         ActionListener[] eventListeners = {
                 e -> {
@@ -176,18 +188,16 @@ public class Menu {
                 },
 
                 e -> System.out.println("Button e clicked"),
-                e -> System.out.println("Button d clicked"),
-                e -> System.out.println("Button d clicked"),
-                e -> System.out.println("Button r clicked"),
 
                 e -> {cardLayout.show(panel, "MenuLauncher");}
         };
 
-        for (int i = 1; i <= 9; i++) {
+        for (int i = 1; i <= nbRows*nbCols; i++) {
             JButton button = new JButton(buttonNames[i-1]); // assign name to every buttons on our list
             button.setFont(new Font(writingPolice, Font.BOLD, 20)); // assigning the same font for every buttons
             button.setBackground(colors[i-1]); // assigning to each button its color
             toolWindow.add(button); // add the button one by one to the panel
+            button.setBorder(BorderFactory.createLineBorder(Color.black, 2, true));
 
             button.addActionListener(eventListeners[i-1]); // put the corresponding action listener to every button, one by one, in the ordre
         }
@@ -228,7 +238,7 @@ public class Menu {
 
         JButton buttonReturn = new JButton("Return to Menu");
         buttonReturn.setFont(new Font(writingPolice, Font.BOLD, 30));
-        buttonReturn.setBackground(Color.RED);
+        buttonReturn.setBackground(colorBrown);
 
         titlePanel.setVisible(true);
         moneyWindow.add(titlePanel, BorderLayout.NORTH);
@@ -280,11 +290,11 @@ public class Menu {
         // setting up two buttons, same code pattern for these two button at the bottom as the menuLauncher() function
         JButton buttonConvert = new JButton("Convert");
         buttonConvert.setFont(new Font(writingPolice, Font.BOLD, 30));
-        buttonConvert.setBackground(Color.GREEN);
+        buttonConvert.setBackground(beigeParchemin);
 
         JButton buttonReturn = new JButton("Return to tools");
         buttonReturn.setFont(new Font(writingPolice, Font.BOLD, 30));
-        buttonReturn.setBackground(Color.RED);
+        buttonReturn.setBackground(colorBrown);
 
         buttonReturn.setBounds(400, 250, 250, 50);
         buttonConvert.setBounds(50, 250, 250, 50);
@@ -338,11 +348,11 @@ public class Menu {
         // adding buttons with the same logic as previously
         JButton buttonLog = new JButton("Log Action");
         buttonLog.setFont(new Font(writingPolice, Font.BOLD, 30));
-        buttonLog.setBackground(new Color(0, 255, 0)); // green
+        buttonLog.setBackground(beigeParchemin); // green
 
         JButton buttonReturn = new JButton("Return to Tools");
         buttonReturn.setFont(new Font(writingPolice, Font.BOLD, 30));
-        buttonReturn.setBackground(Color.RED);
+        buttonReturn.setBackground(colorBrown);
 
         JPanel panelButtons = new JPanel(new GridLayout(1, 2, 10, 0));
         panelButtons.add(buttonLog);
@@ -372,6 +382,8 @@ public class Menu {
         panelActions.add(transactionNotesArea);
         panelActions.add(new JLabel("Transaction Type:"));
         panelActions.add(typeBox);
+
+        panelButtons.setFont(new Font(writingPolice, Font.BOLD, 30));
 
         actionsWindow.add(panelActions, BorderLayout.CENTER);
 
@@ -411,6 +423,8 @@ public class Menu {
                 errorMessage("Please enter a positive amount of money !"); // check positive amount of money
                 return;
             }
+
+
 
             try{
                 if (Objects.equals(type, "Withdraw") && transactionAmount > db.getMoney() + db.getMoneyLimit()){ // check if the user want to withdraw more money than ha actually has
@@ -459,12 +473,11 @@ public class Menu {
                 infoMessage("Successful withdraw " + transactionAmount + "$ ! You have now " + String.format("%.2f", moneyAfter) + "$ !");
             }
 
-            // reset to text areas, ready to proceed another withdrax/deposit
+            // reset to text areas, ready to proceed another withdraw/deposit
             amountMoneyArea.setText("");
             transactionNotesArea.setText("");
 
         });
-
         return actionsWindow;
     }
 
@@ -475,7 +488,7 @@ public class Menu {
         // implementing buttons using the same logic as before
         JButton buttonReturn = new JButton("Return to Tools");
         buttonReturn.setFont(new Font(writingPolice, Font.BOLD, 30));
-        buttonReturn.setBackground(Color.RED);
+        buttonReturn.setBackground(colorBrown);
 
         JPanel panelButtons = new JPanel(new GridLayout(1, 1, 10, 0));
         panelButtons.add(buttonReturn);
@@ -509,10 +522,10 @@ public class Menu {
                     JLabel label = new JLabel(data);
                     label.setHorizontalAlignment(SwingConstants.CENTER); // align cells
                     rowPanel.add(label);
-                    label.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                    label.setBorder(BorderFactory.createLineBorder(beigeParchemin));
                 }
-                rowPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY)); // interline border
-                historyPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY)); // outline (exterior) border
+                rowPanel.setBorder(BorderFactory.createLineBorder(beigeParchemin)); // interline border
+                historyPanel.setBorder(BorderFactory.createLineBorder(beigeParchemin)); // outline (exterior) border
                 historyPanel.add(rowPanel);
             }
         } catch (SQLException ex) {
@@ -554,10 +567,10 @@ public class Menu {
                 JLabel label = new JLabel(data);
                 label.setHorizontalAlignment(SwingConstants.CENTER); // align cells
                 rowPanel.add(label);
-                label.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                label.setBorder(BorderFactory.createLineBorder(beigeParchemin));
             }
-            rowPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY)); // interline border
-            historyPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY)); // outline (exterior) border
+            rowPanel.setBorder(BorderFactory.createLineBorder(beigeParchemin)); // interline border
+            historyPanel.setBorder(BorderFactory.createLineBorder(beigeParchemin)); // outline (exterior) border
             historyPanel.add(rowPanel);
         }
 
@@ -602,11 +615,11 @@ public class Menu {
         // implementing two buttons, using the same logic as before
         JButton buttonSetLimit = new JButton("Set Limit");
         buttonSetLimit.setFont(new Font(writingPolice, Font.BOLD, 30));
-        buttonSetLimit.setBackground(Color.GREEN);
+        buttonSetLimit.setBackground(beigeParchemin);
 
         JButton buttonReturn = new JButton("Return to tools");
         buttonReturn.setFont(new Font(writingPolice, Font.BOLD, 30));
-        buttonReturn.setBackground(Color.RED);
+        buttonReturn.setBackground(colorBrown);
 
         buttonReturn.setBounds(400, 250, 250, 50);
         buttonSetLimit.setBounds(50, 250, 250, 50);
@@ -652,6 +665,13 @@ public class Menu {
         userMoneyDouble = db.getMoney();
         userMoney = String.format("%.2f", userMoneyDouble);
         moneyButton.setText(userMoney + "$");
+        if (db.getMoney() <= 0){
+            moneyButton.setBorder(BorderFactory.createLineBorder(Color.RED, 5, true));
+        }
+        else{
+            moneyButton.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1, true));
+        }
+
         panel.revalidate();
         panel.repaint();
         this.actualMoney = db.getMoney(); // update the money

@@ -25,7 +25,8 @@ public class DatabaseCreation {
             // Create USER table
             String createTableQuery_user = "CREATE TABLE IF NOT EXISTS user (" +
                     "money DECIMAL(13,2) DEFAULT NULL, " +  // Total precision of 13 digits with 2 after the comma
-                    "money_limit DECIMAL(13,2) DEFAULT NULL)";
+                    "money_limit DECIMAL(13,2) DEFAULT NULL," +
+                    "budget DECIMAL(13,2) NOT NULL DEFAULT 2000.00);";
             statement.executeUpdate(createTableQuery_user);
 
             // Check if any rows exist in the user table
