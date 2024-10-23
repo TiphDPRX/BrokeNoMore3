@@ -41,6 +41,7 @@ public class Menu {
 
     double actualMoney = db.getMoney();
     JButton moneyButton; // button for user money amount
+    JTextField currentBudget; //
 
     // colors
     Color beigeParchemin = new Color(245,222,175); // name of the color
@@ -189,7 +190,12 @@ public class Menu {
                     }
                 },
 
-                e -> {cardLayout.show(panel, "budgetWindow");},
+                e -> {cardLayout.show(panel, "budgetWindow");
+                    try {
+                        currentBudget.setText(String.format("%.2f", db.getMoneyBudget())); // update of the budget
+                    } catch (SQLException ex) {
+                        errorMessage("Failed to load current budget.");
+                    }},
 
                 e -> {cardLayout.show(panel, "MenuLauncher");}
         };
@@ -657,20 +663,17 @@ public class Menu {
         limitAreaDisplay.setVerticalAlignment(JLabel.CENTER); // Align vertically to center with the text fields
 
         // Text AREAS
-        JTextField textArea = new JTextField();
-        textArea.setFont(new Font(writingPolice, Font.BOLD, 30));
-        JTextField textArea2 = new JTextField();
-        textArea2.setFont(new Font(writingPolice, Font.BOLD, 30)); //show the current limit
-        textArea.setBorder(BorderFactory.createLineBorder(Color.black, 5, true));
-        textArea2.setBorder(BorderFactory.createLineBorder(Color.black, 5, true));
+        JTextField newBudget = new JTextField();
+        newBudget.setFont(new Font(writingPolice, Font.BOLD, 30));
+        currentBudget = new JTextField();
+        currentBudget.setFont(new Font(writingPolice, Font.BOLD, 30)); //show the current limit
+        newBudget.setBorder(BorderFactory.createLineBorder(Color.black, 5, true));
+        currentBudget.setBorder(BorderFactory.createLineBorder(Color.black, 5, true));
 
-        textArea2.setEditable(false);
-        try {
-            textArea2.setText(String.format("%.2f", db.getMoneyBudget())); // Call getMoneyBudget() to get the correct value
-        } catch (SQLException ex) {
-            errorMessage("Failed to load current budget.");
-        }
 
+        currentBudget.setText(String.format("%.2f", db.getMoneyBudget())); // Call getMoneyBudget() to get the correct value
+
+        currentBudget.setEditable(false);
         // Buttons
         JButton buttonSetBudget = new JButton("Set Limit");
         buttonSetBudget.setFont(new Font(writingPolice, Font.BOLD, 30));
@@ -685,30 +688,30 @@ public class Menu {
         // Add labels, text fields, and buttons to the panel
         budgetWindow.add(limitArea);
         budgetWindow.add(limitAreaDisplay);
-        budgetWindow.add(textArea);
-        budgetWindow.add(textArea2);
+        budgetWindow.add(newBudget);
+        budgetWindow.add(currentBudget);
         budgetWindow.add(buttonSetBudget);
         budgetWindow.add(buttonReturn);
 
         buttonSetBudget.addActionListener(e -> {
-            if (textArea.getText().isEmpty()){
+            if (newBudget.getText().isEmpty()){
                 errorMessage("You must specify the new budget !");
                 return;
             }
 
-            if ( !!! textArea.getText().matches("^[0-9]+([,.][0-9])?([0-9])?$")){ // allowing only number with 2 decimal maximum after the comma or the dot
+            if ( !!! newBudget.getText().matches("^[0-9]+([,.][0-9])?([0-9])?$")){ // allowing only number with 2 decimal maximum after the comma or the dot
                 errorMessage("Put a valid budget amount !");
                 return;
             }
 
             try {
-                String amountString = textArea.getText().replace(",", "."); // replace comma with dot if needed
+                String amountString = newBudget.getText().replace(",", "."); // replace comma with dot if needed
                 double amountDouble = Double.parseDouble(amountString); // convert to double
 
                 db.setMoneyBudget(amountDouble); // set money budget into db
-                textArea2.setText(String.format("%.2f", amountDouble)); // display the new budget in the second text area
+                currentBudget.setText(String.format("%.2f", amountDouble)); // display the new budget in the second text area
                 infoMessage("Succesfully set the new budget at " + amountString + "$ !");
-                textArea.setText("");
+                newBudget.setText("");
 
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
@@ -716,6 +719,7 @@ public class Menu {
         });
 
         buttonReturn.addActionListener(e -> {
+
             cardLayout.show(panel, "ToolWindow");
         });
 
