@@ -1,5 +1,6 @@
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,6 +82,28 @@ public class DB {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public double getMoneyBudget() throws SQLException {
+        double budget = 0;
+        try {
+
+            Connection connection = setDB();
+            Statement statement = connection.createStatement();
+
+            String query = "SELECT budget FROM user"; // query to get money_limit
+
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) { // read query and get query result
+                budget = resultSet.getDouble("budget");
+            }
+
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            throw e; //the caller must be informed if there were a problem
+        }
+        return budget;
     }
 
     public void addMoney(double moneyAmount) throws SQLException {
@@ -170,6 +193,25 @@ public class DB {
                     "UPDATE user SET money_limit = ?" // statement to update money_limit
             );
             preparedStatement.setDouble(1, limit); // put value into the statement
+
+            preparedStatement.executeUpdate();
+
+            connection.close();
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    public void setMoneyBudget(double budget) throws SQLException {
+        //same logic as setMoneyLimit()
+        try{
+            Connection connection = setDB();
+
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "UPDATE user SET budget = ?" // statement to update money_limit
+            );
+            preparedStatement.setDouble(1, budget); // put value into the statement
 
             preparedStatement.executeUpdate();
 
