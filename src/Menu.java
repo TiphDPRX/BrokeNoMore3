@@ -1,5 +1,8 @@
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+//import javafx.scene.chart.PieChart;
+
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
@@ -18,19 +21,28 @@ public class Menu {
     int windowY = 350;
 
 
-    //money reloader
+    // money reloader
     private double userMoneyDouble;
     private String userMoney;
 
 
-    //history reloader
+    // history reloader
     JPanel historyPanel;
     List<List<String>> history;
     JPanel rowPanel;
     String[] columnsName = {"ID", "Money Before", "Amount", "Type" , "Money After", "Date", "Notes"};
 
 
-    //window
+    // monthly report reloader
+    JPanel barChartPanel;
+    double income;
+    double expenses;
+    LocalDate today;
+    IntegerPair results;
+    JPanel monthlyReportWindow;
+
+
+    // window
     JFrame frame;
     CardLayout cardLayout;
     JPanel panel;
@@ -53,7 +65,7 @@ public class Menu {
         frame = new JFrame("BrokeNoMore Manager");
         frame.setSize(this.windowX, this.windowY);
         frame.setLocationRelativeTo(null); // put the frame in the middle of the frame
-        frame.setResizable(false); // disallow resizing the window
+        frame.setResizable(true); // disallow resizing the window
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // exit when close cross pressed
 
         cardLayout = new CardLayout();
@@ -63,7 +75,7 @@ public class Menu {
         JPanel toolWindow = toolWindow();
         JPanel moneyWindow = moneyWindow();
         JPanel converterWindow = converterWindow();
-        //JPanel monthlyReportWindow = monthlyReportWindow();
+        JPanel monthlyReportWindow = monthlyReportWindow();
         JPanel actionsWindow = actionsWindow();
         JPanel historyWindow = historyWindow();
         JPanel limitWindow = limitWindow();
@@ -77,6 +89,7 @@ public class Menu {
         panel.add(historyWindow, "historyWindow");
         panel.add(limitWindow, "limitWindow");
         panel.add(budgetWindow, "budgetWindow");
+        panel.add(monthlyReportWindow, "MonthlyReportWindow");
         frame.add(panel);
 
         frame.setVisible(true);
@@ -97,6 +110,7 @@ public class Menu {
         moneyButton = new JButton(this.userMoney + "$"); // label where the amount of money is displayed "button" because we need to click on it
         moneyButton.setFont(new Font(writingPolice, Font.PLAIN, 50));
         moneyButton.setBackground(new Color(255, 239, 213)); // set color
+        moneyButton.setHorizontalAlignment(SwingConstants.CENTER);
 
         if (db.getMoney() < 0){
             moneyButton.setBorder(BorderFactory.createLineBorder(Color.RED, 5, true));
@@ -109,9 +123,16 @@ public class Menu {
         panelBalance.setLayout(new BoxLayout(panelBalance, BoxLayout.Y_AXIS));
         panelBalance.add(titleLabel);
 
+        // monthly report button
+        JButton monthlyReportButton = new JButton("Report");
+        monthlyReportButton.setFont(new Font(writingPolice, Font.BOLD, 30));
+        monthlyReportButton.setBackground(new Color(100,120,245));
+
         // add some spacing between the label and button
-        panelBalance.add(Box.createVerticalStrut(10));
+        panelBalance.add(Box.createVerticalStrut(5));
         panelBalance.add(moneyButton);
+
+
 
         // align components to the center
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -127,9 +148,11 @@ public class Menu {
         buttonClose.setFont(new Font(writingPolice, Font.BOLD, 30));
         buttonClose.setBackground(colorBrown); // button close main
 
-        JPanel panelButtons = new JPanel(new GridLayout(1, 2, 10, 0)); // grid layout for displaying the two buttons at the bottom of the panel
+        JPanel panelButtons = new JPanel(new GridLayout(1, 3, 10, 0)); // grid layout for displaying the two buttons at the bottom of the panel
         panelButtons.add(buttonTool);
+        panelButtons.add(monthlyReportButton);
         panelButtons.add(buttonClose);
+
 
         // setting sizes
         buttonClose.setSize(250, 100);
@@ -152,6 +175,15 @@ public class Menu {
         buttonClose.addActionListener(e -> {
             frame.dispose();
             System.exit(0); // stop the Java program from running
+        });
+
+        monthlyReportButton.addActionListener(e -> {
+            try {
+                reloadReportWindow();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+            cardLayout.show(panel, "MonthlyReportWindow");
         });
         return menuLauncher;
     }
@@ -211,6 +243,67 @@ public class Menu {
         }
         //frame.setVisible(true);
         return toolWindow;
+    }
+
+    public JPanel monthlyReportWindow() throws SQLException {
+        JPanel monthlyReportWindow = new JPanel(new BorderLayout());
+        LocalDate today = LocalDate.now();
+        IntegerPair results = db.getMonthlyHistory(today);
+
+        JButton buttonReturn = new JButton("Return to Menu");
+        buttonReturn.setFont(new Font(writingPolice, Font.BOLD, 30));
+        buttonReturn.setBackground(colorBrown);
+
+        buttonReturn.addActionListener(eventListeners -> {
+            cardLayout.show(panel, "MenuLauncher");
+        });
+
+        class BarChart extends JPanel {
+
+            public BarChart(double income_, double expenses_) {
+                income = income_;
+                expenses = expenses_;
+                setPreferredSize(new Dimension(300, 300));
+            }
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+
+                int width = 100; // Width of each bar
+                int height = getHeight();
+                int maxBarHeight = height - 50; // Leave some space at the top and bottom
+
+                // Calculate the height of income and expense bars based on the total
+                double total = income + Math.abs(expenses);
+                int incomeBarHeight = (int) (income / total * maxBarHeight);
+                int expenseBarHeight = (int) (Math.abs(expenses) / total * maxBarHeight);
+
+                // Draw income bar (green)
+                g2d.setColor(Color.GREEN);
+                g2d.fillRect(50, height - incomeBarHeight - 30, width, incomeBarHeight);
+
+                // Draw labels
+                g2d.setColor(Color.RED);
+                g2d.fillRect(200, height - expenseBarHeight - 30, width, expenseBarHeight);
+
+                // Draw expenses bar (red)
+                g2d.setColor(Color.BLACK);
+                g2d.drawString("Income", 70, height - 10);
+                g2d.drawString("Expenses", 220, height - 10);
+
+                // print value above charts
+                g2d.setColor(Color.BLACK);
+                g2d.drawString(String.format("%.2f", income), 70, height - incomeBarHeight - 40); // position above the income bar
+                g2d.drawString(String.format("%.2f", expenses), 220, height - expenseBarHeight - 40);
+            }
+        }
+
+        barChartPanel = new BarChart(results.getFirst(), results.getSecond());
+        monthlyReportWindow.add(buttonReturn, BorderLayout.SOUTH);
+        monthlyReportWindow.add(barChartPanel, BorderLayout.CENTER);
+        return monthlyReportWindow;
     }
 
     public JPanel moneyWindow(){
@@ -654,19 +747,19 @@ public class Menu {
 
         // Create 2 labels with corresponding text areas
         // LABELS
-        JLabel limitArea = new JLabel("Set new limit", JLabel.CENTER); // Center the label text
-        limitArea.setFont(new Font(writingPolice, Font.BOLD, 30));
-        limitArea.setVerticalAlignment(JLabel.CENTER); // Align vertically to center with the text fields
+        JLabel budgetArea = new JLabel("Set new budget", JLabel.CENTER); // Center the label text
+        budgetArea.setFont(new Font(writingPolice, Font.BOLD, 30));
+        budgetArea.setVerticalAlignment(JLabel.CENTER); // Align vertically to center with the text fields
 
-        JLabel limitAreaDisplay = new JLabel("Current limit", JLabel.CENTER); // Center the label text
-        limitAreaDisplay.setFont(new Font(writingPolice, Font.BOLD, 30));
-        limitAreaDisplay.setVerticalAlignment(JLabel.CENTER); // Align vertically to center with the text fields
+        JLabel budgetAreaDisplay = new JLabel("Current budget", JLabel.CENTER); // Center the label text
+        budgetAreaDisplay.setFont(new Font(writingPolice, Font.BOLD, 30));
+        budgetAreaDisplay.setVerticalAlignment(JLabel.CENTER); // Align vertically to center with the text fields
 
         // Text AREAS
         JTextField newBudget = new JTextField();
         newBudget.setFont(new Font(writingPolice, Font.BOLD, 30));
         currentBudget = new JTextField();
-        currentBudget.setFont(new Font(writingPolice, Font.BOLD, 30)); //show the current limit
+        currentBudget.setFont(new Font(writingPolice, Font.BOLD, 30)); //show the current budget
         newBudget.setBorder(BorderFactory.createLineBorder(Color.black, 5, true));
         currentBudget.setBorder(BorderFactory.createLineBorder(Color.black, 5, true));
 
@@ -675,7 +768,7 @@ public class Menu {
 
         currentBudget.setEditable(false);
         // Buttons
-        JButton buttonSetBudget = new JButton("Set Limit");
+        JButton buttonSetBudget = new JButton("Set budget");
         buttonSetBudget.setFont(new Font(writingPolice, Font.BOLD, 30));
         buttonSetBudget.setBackground(beigeParchemin);
 
@@ -686,8 +779,8 @@ public class Menu {
 
 
         // Add labels, text fields, and buttons to the panel
-        budgetWindow.add(limitArea);
-        budgetWindow.add(limitAreaDisplay);
+        budgetWindow.add(budgetArea);
+        budgetWindow.add(budgetAreaDisplay);
         budgetWindow.add(newBudget);
         budgetWindow.add(currentBudget);
         budgetWindow.add(buttonSetBudget);
@@ -826,6 +919,69 @@ public class Menu {
         this.actualMoney = db.getMoney(); // update the money
     }
 
+    public void reloadReportWindow() throws SQLException {
+
+        barChartPanel.removeAll();
+
+        today = LocalDate.now();
+        results = db.getMonthlyHistory(today);
+
+        JButton buttonReturn = new JButton("Return to Menu");
+        buttonReturn.setFont(new Font(writingPolice, Font.BOLD, 30));
+        buttonReturn.setBackground(colorBrown);
+
+        buttonReturn.addActionListener(eventListeners -> {
+            cardLayout.show(panel, "MenuLauncher");
+        });
+
+        class BarChart extends JPanel {
+
+            public BarChart(double income_, double expenses_) {
+                income = income_;
+                expenses = expenses_;
+                setPreferredSize(new Dimension(300, 300));
+            }
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+
+                int width = 100; // Width of each bar
+                int height = getHeight();
+                int maxBarHeight = height - 50; // Leave some space at the top and bottom
+
+                // Calculate the height of income and expense bars based on the total
+                double total = income + Math.abs(expenses);
+                int incomeBarHeight = (int) (income / total * maxBarHeight);
+                int expenseBarHeight = (int) (Math.abs(expenses) / total * maxBarHeight);
+
+                // Draw income bar (green)
+                g2d.setColor(Color.GREEN);
+                g2d.fillRect(50, height - incomeBarHeight - 30, width, incomeBarHeight);
+
+                // Draw labels
+                g2d.setColor(Color.RED);
+                g2d.fillRect(200, height - expenseBarHeight - 30, width, expenseBarHeight);
+
+                // Draw expenses bar (red)
+                g2d.setColor(Color.BLACK);
+                g2d.drawString("Income", 70, height - 10);
+                g2d.drawString("Expenses", 220, height - 10);
+
+                // print value above charts
+                g2d.setColor(Color.BLACK);
+                g2d.drawString(String.format("%.2f", income), 70, height - incomeBarHeight - 40); // position above the income bar
+                g2d.drawString(String.format("%.2f", expenses), 220, height - expenseBarHeight - 40);
+            }
+        }
+
+        barChartPanel = new BarChart(results.getFirst(), results.getSecond());
+
+        panel.revalidate();
+        panel.repaint();
+    }
+
     public void errorMessage(String message){
         JOptionPane.showMessageDialog(panel, "🚨 WARNING : " + message); // format all error message so we onyl have to call this function when we want to display an error message
     }
@@ -833,16 +989,6 @@ public class Menu {
     public void infoMessage(String message){
         JOptionPane.showMessageDialog(panel, "INFO : " + message);
     }
-
-
-
-    /*public void monthlyReportCheck() {
-        LocalDate date = LocalDate.now();
-        int dayOfMonth = date.getDayOfMonth();
-        if (dayOfMonth == 01){
-
-        }
-    }*/
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {

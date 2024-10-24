@@ -2,6 +2,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -10,7 +12,7 @@ public class DB {
 
     public String[] GetDbInfo(){
         Properties props = new Properties();
-        try (FileInputStream fis = new FileInputStream("./config.properties")) { // get file
+        try (FileInputStream fis = new FileInputStream("../config.properties")) { // get file
             props.load(fis);
         } catch (IOException e) { // check errors
             e.printStackTrace();
@@ -183,6 +185,44 @@ public class DB {
             e.printStackTrace();
         }
         return new ArrayList<>(); // if there is a problem, return an empty list of list
+    }
+
+    
+
+    public IntegerPair getMonthlyHistory(LocalDate date) throws SQLException {
+        LocalDate minusMonthDate = date.minusMonths(1);
+        DateTimeFormatter standardDateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = date.format(standardDateFormat);
+        String formattedMinusMonthDate = minusMonthDate.format(standardDateFormat);
+
+        try {
+            double income = 1;
+            double expanses = -1;
+            Connection connection = setDB();
+
+            Statement statement = connection.createStatement();
+
+            String query = "SELECT * FROM logs WHERE timestamp BETWEEN '" + formattedMinusMonthDate + "' AND '" + formattedDate + " 23:59:59'"; // query to select all records from logs table
+
+            ResultSet resultSet = statement.executeQuery(query);
+
+            while (resultSet.next()) {
+
+                String amount = resultSet.getString("amount");
+                double convertedAmount = Double.parseDouble(amount);
+                String type = resultSet.getString("type");
+                if (type.equals("Deposit")){
+                    income += convertedAmount;
+                } else {
+                    expanses += convertedAmount;
+                }
+            }
+            return new IntegerPair(income, expanses);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new IntegerPair(999999999, 999999999); // if there is a problem, returns an absurd amount of 9
     }
 
     public void setMoneyLimit(double limit) throws SQLException {
