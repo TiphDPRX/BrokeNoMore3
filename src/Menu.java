@@ -65,7 +65,7 @@ public class Menu {
         frame = new JFrame("BrokeNoMore Manager");
         frame.setSize(this.windowX, this.windowY);
         frame.setLocationRelativeTo(null); // put the frame in the middle of the frame
-        frame.setResizable(true); // disallow resizing the window
+        frame.setResizable(false); // disallow resizing the window
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // exit when close cross pressed
 
         cardLayout = new CardLayout();
@@ -259,7 +259,6 @@ public class Menu {
         });
 
         class BarChart extends JPanel {
-
             public BarChart(double income_, double expenses_) {
                 income = income_;
                 expenses = expenses_;
@@ -280,25 +279,31 @@ public class Menu {
                 int incomeBarHeight = (int) (income / total * maxBarHeight);
                 int expenseBarHeight = (int) (Math.abs(expenses) / total * maxBarHeight);
 
+                // Determine X positions to center the bars
+                int incomeBarX = (getWidth() / 2) - 150; // Income bar
+                int expenseBarX = (getWidth() / 2) + 50; // Expenses bar
+
                 // Draw income bar (green)
                 g2d.setColor(Color.GREEN);
-                g2d.fillRect(50, height - incomeBarHeight - 30, width, incomeBarHeight);
-
-                // Draw labels
-                g2d.setColor(Color.RED);
-                g2d.fillRect(200, height - expenseBarHeight - 30, width, expenseBarHeight);
+                g2d.fillRect(incomeBarX, height - incomeBarHeight - 30, width, incomeBarHeight);
 
                 // Draw expenses bar (red)
+                g2d.setColor(Color.RED);
+                g2d.fillRect(expenseBarX, height - expenseBarHeight - 30, width, expenseBarHeight);
+
+                // Draw labels
                 g2d.setColor(Color.BLACK);
-                g2d.drawString("Income", 70, height - 10);
-                g2d.drawString("Expenses", 220, height - 10);
+                g2d.drawString("Income", incomeBarX + 20, height - 10);
+                g2d.drawString("Expenses", expenseBarX + 20, height - 10);
 
                 // print value above charts
-                g2d.setColor(Color.BLACK);
-                g2d.drawString(String.format("%.2f", income), 70, height - incomeBarHeight - 40); // position above the income bar
-                g2d.drawString(String.format("%.2f", expenses), 220, height - expenseBarHeight - 40);
+                g2d.drawString(String.format("%.2f", income), incomeBarX + 20, height - incomeBarHeight - 40); // position above the income bar
+                g2d.drawString(String.format("%.2f", expenses), expenseBarX + 20, height - expenseBarHeight - 40);
+
+                g2d.setFont(new Font(writingPolice, Font.BOLD, 30));
             }
         }
+
 
         barChartPanel = new BarChart(results.getFirst(), results.getSecond());
         monthlyReportWindow.add(buttonReturn, BorderLayout.SOUTH);

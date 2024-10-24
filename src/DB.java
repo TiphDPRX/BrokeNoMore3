@@ -12,7 +12,7 @@ public class DB {
 
     public String[] GetDbInfo(){
         Properties props = new Properties();
-        try (FileInputStream fis = new FileInputStream("../config.properties")) { // get file
+        try (FileInputStream fis = new FileInputStream("./config.properties")) { // get file
             props.load(fis);
         } catch (IOException e) { // check errors
             e.printStackTrace();
